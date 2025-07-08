@@ -1,0 +1,3 @@
+https://lenta.ru/rss/news
+https://www.kommersant.ru/RSS/news.xml
+https://ria.ru/export/rss2/archive/index.xml
