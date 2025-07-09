@@ -26,6 +26,7 @@ API_HASH=ваш_api_hash
 PHONE_NUMBER=ваш_номер_телефона
 TELEGRAM_PASSWORD=ваш_пароль_для_2FA
 ```
+(Вам потребуются **API ID** и **API HASH** с my.telegram.org)
 
 4. Настройка источников
 
