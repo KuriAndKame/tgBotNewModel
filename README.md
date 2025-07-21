@@ -23,9 +23,9 @@ API_ID=ваш_api_id
 API_HASH=ваш_api_hash
 PHONE_NUMBER=ваш_номер_телефона
 TELEGRAM_PASSWORD=ваш_пароль_для_2FA
-DB_URL=mysql+pymysql://имя_пользователя:пароль@хост/название_БД
+DB_URL=mysql+pymysql://имя_пользователя:пароль@хост/название_базы_данных
 ```
-(Вам потребуются **API ID** и **API HASH** с [my.telegram.org](https://my.telegram.org/), а также **данные** для подключения к базе данных)
+(Вам потребуются **API ID** и **API HASH** с [my.telegram.org](https://my.telegram.org/), а также **данные** для подключения к БД)
 
 4. Настройка источников
 
