@@ -1,6 +1,4 @@
 # Telegram & RSS Parser
-
-**Telegram & RSS Parser** — это Python-проект для мониторинга новостей из Telegram-каналов и RSS-лент. Парсеры сохраняют новые записи в формате JSON и позволяют автоматизировать сбор информации из разных источников.
 ## Установка
 
 1. Клонируйте репозиторий:
@@ -15,18 +13,19 @@ cd parser4vgtrk
 pip install -r requirements.txt
 ```
 
-3. Создайте файл **.env** с данными для авторизации в Telegram:
+3. Создайте файл **.env** с данными для авторизации:
 ```bash
 python DotEnvCreate.py
 ```
-Или создайте **.env** вручную:
+Или создайте **.env** в корневой директории проекта вручную:
 ```
 API_ID=ваш_api_id
 API_HASH=ваш_api_hash
 PHONE_NUMBER=ваш_номер_телефона
 TELEGRAM_PASSWORD=ваш_пароль_для_2FA
+DB_URL=mysql+pymysql://имя_пользователя:пароль@хост/название_БД
 ```
-(Вам потребуются **API ID** и **API HASH** с my.telegram.org)
+(Вам потребуются **API ID** и **API HASH** с [my.telegram.org](https://my.telegram.org/), а также **данные** для подключения к базе данных)
 
 4. Настройка источников
 
@@ -54,9 +53,3 @@ python TelegramParser.py
 ```bash
 python RSSParser.py
 ```
-
-6. Результаты
-
-**output/telegram.json** — список сообщений из Telegram.
-
-**output/rss.json** — список записей из RSS-лент.
