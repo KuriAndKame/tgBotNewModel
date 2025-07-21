@@ -4,6 +4,9 @@ import asyncio
 from dotenv import load_dotenv
 from telethon import TelegramClient, events
 from telethon.errors import SessionPasswordNeededError
+from sqlalchemy.orm import sessionmaker
+from datetime import datetime
+from models.Posts import TelegramPost, init_db
 
 load_dotenv()
 
@@ -11,6 +14,7 @@ API_ID = int(os.getenv('API_ID', 0))
 API_HASH = os.getenv('API_HASH', '')
 PHONE_NUMBER = os.getenv('PHONE_NUMBER', '')
 TELEGRAM_PASSWORD = os.getenv('TELEGRAM_PASSWORD', '')
+DB_URL = os.getenv('DB_URL', 'mysql+pymysql://user:password@localhost/news_db')
 
 INPUT_CHANNELS_FILE = 'data/channels.txt'
 OUTPUT_FILE = 'output/telegram.json'
@@ -23,6 +27,9 @@ class TelegramParser:
         self.initialize_files()
         self.processed_messages = set()
         self.shutdown = False
+
+        self.engine = init_db(DB_URL)
+        self.Session = sessionmaker(bind=self.engine)
 
     def initialize_files(self):
         if not os.path.exists(INPUT_CHANNELS_FILE):
@@ -88,10 +95,39 @@ class TelegramParser:
         }
 
         self.save_to_json(news_item)
+        self.save_to_db(news_item)
         print(f"[{channel.title}] Новое сообщение: {message.text}")
 
         self.processed_messages.add(message_id)
         return news_item
+
+    def save_to_db(self, news_item):
+        try:
+            session = self.Session()
+
+            existing_post = session.query(TelegramPost).filter_by(
+                channel_id=news_item['channel_id'],
+                message_id=news_item['message_id']
+            ).first()
+
+            if not existing_post:
+                post = TelegramPost(
+                    date=datetime.fromisoformat(news_item['date']),
+                    channel_id=news_item['channel_id'],
+                    channel_name=news_item['channel_name'],
+                    message_id=news_item['message_id'],
+                    text=news_item['text'],
+                    url=news_item['url']
+                )
+                session.add(post)
+                session.commit()
+
+                # print(f"Новость с канала {news_item['channel_name']} сохранена в базу данных.")
+        except Exception as e:
+            print(f"Ошибка при сохранении в базу данных: {e}")
+            session.rollback()
+        finally:
+            session.close()
 
     def save_to_json(self, news_item):
         try:
@@ -159,6 +195,7 @@ async def main():
     finally:
         if not parser.shutdown:
             await parser.client.disconnect()
+        parser.engine.dispose()
 
 
 if __name__ == '__main__':

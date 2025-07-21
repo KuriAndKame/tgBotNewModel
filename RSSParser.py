@@ -5,9 +5,12 @@ import aiohttp
 import feedparser
 from datetime import datetime, timezone
 from urllib.parse import urlparse
+from sqlalchemy.orm import sessionmaker
+from models.Posts import RSSPost, init_db
 
 INPUT_SITES_FILE = 'data/sites.txt'
 OUTPUT_FILE = 'output/rss.json'
+DB_URL = os.getenv('DB_URL', 'mysql+pymysql://user:password@localhost/news_db')
 CHECK_INTERVAL = 60
 
 
@@ -16,6 +19,9 @@ class RSSParser:
         self.initialize_files()
         self.start_time = datetime.now(timezone.utc)
         self.session = None
+
+        self.engine = init_db(DB_URL)
+        self.Session = sessionmaker(bind=self.engine)
 
     def initialize_files(self):
         if not os.path.exists(INPUT_SITES_FILE):
@@ -92,8 +98,38 @@ class RSSParser:
 
                     domain = self.get_domain_name(source_url)
                     print(f"[{domain}] {news_item['title']}")
+            self.save_to_db(news_item, source_url)
         except Exception as e:
             print(f"Ошибка при сохранении в файл: {str(e)}.")
+
+    def save_to_db(self, news_item, source_url):
+        try:
+            session = self.Session()
+
+            existing_post = session.query(RSSPost).filter_by(
+                rss_id=news_item['rss_id']
+            ).first()
+
+            if not existing_post:
+                post = RSSPost(
+                    date=datetime.fromisoformat(news_item['date']),
+                    source=news_item['source'],
+                    title=news_item['title'],
+                    summary=news_item['summary'],
+                    link=news_item['link'],
+                    rss_id=news_item['rss_id'],
+                    source_type=news_item.get('source_type', 'rss')
+                )
+                session.add(post)
+                session.commit()
+
+                # domain = self.get_domain_name(source_url)
+                # print(f"Новость с сайта {domain} сохранена в базу данных.")
+        except Exception as e:
+            print(f"Ошибка при сохранении в БД: {str(e)}.")
+            session.rollback()
+        finally:
+            session.close()
 
     async def check_feeds(self):
         sites = self.get_sites()
@@ -128,8 +164,9 @@ class RSSParser:
                     print("\nЗавершение работы RSS-парсера.")
                     break
                 except Exception as e:
-                    print(f"Ошибка в основном цикле: {str(e)}")
+                    print(f"Ошибка в основном цикле: {str(e)}.")
                     await asyncio.sleep(30)
+        self.engine.dispose()
 
 
 if __name__ == '__main__':

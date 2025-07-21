@@ -2,3 +2,5 @@ python-dotenv
 telethon
 aiohttp
 feedparser
+sqlalchemy
+pymysql
