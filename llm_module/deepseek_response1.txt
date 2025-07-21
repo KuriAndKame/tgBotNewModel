@@ -1,0 +1,41 @@
+<think>
+Okay, let's tackle this query step by step. The user wants me to act as a professional journalist and rewrite a news article in Russian while preserving its essence but changing the wording slightly. There are specific rules I need to follow.
+
+First, check for any existing quotes or citations - these must remain unchanged according to rule 1. In the provided text, there are several direct quotes from Alexey Fetisov that can't be altered.
+
+Now consider how to approach the rest of the content (rule 2). Need to maintain: factual accuracy, paragraph structure and count, overall style as a news article while ensuring no identical text is preserved. The original has three main paragraphs plus the quoted sections - this should remain consistent in my rewrite.
+
+For the headline transformation (rule 4), since one exists ("Цифровой наставник"), I'll need to slightly rephrase it keeping similar length and meaning, maybe under 200 characters as requested.
+
+Output formatting is clearly specified with XML tags (header, rewritten, summary, tags) so will strictly follow this template. For the tags section, select from provided list - original topic seems most relevant would be "искусственный интеллект" or its expansion in Russian context.
+
+As a professional journalist working on this rewrite, I'll focus on making the text flow naturally while improving clarity and readability where possible without changing any facts or structure significantly. The summary (rule 4) should capture core points concisely in just 2-3 sentences.
+</think>
+<header>
+Цифровой наставник Т1: ИИ как решение кадровых вопросов в экономике
+</header>
+
+<rewritten>
+Согласно заявлению генерального директора российского IT-холдинга Т1 Алексея Фетисова, компания разрабатывает цифрового помощника на базе искусственного интеллекта для поддержки новых сотрудников. По словам руководителя, внедрение ИИ является ключевым элементом стратегии крупных российских корпораций во всех сферах деятельности.
+
+Фетисов акцентирует внимание на создании передовых виртуальных инструментов: "Мы рассматриваем разработку ИИ-алгоритмов как неотъемлемую часть повышения эффективности работы наших сотрудников и оптимизации бизнес-процессов с помощью этой технологии. Важно использовать возможности искусственного интеллекта, чтобы помочь новичкам в холдинге: решать бытовые вопросы, отвечать на запросы и знакомить с коллегами".
+
+Генеральный директор подчеркнул прогресс современных ИИ-систем: "Однако это не обычная система голосового управления. Мы имеем дело с масштабными языковыми моделями, которые обладают глубоким контекстом и могут решать практические задачи, зная информацию о сотруднике и бизнесе".
+
+В качестве примера применения технологии Алексей Фетисов привел виртуального юриста: "Мы активно используем подобные инструменты внутри компании. ИИ успешно справляется с задачами по подготовке документации, проведению кросс-анализов и выявлению соответствующих выборок".
+
+Ключевыми направлениями внедрения искусственного интеллекта в бизнес Т1 является решение проблемы нехватки квалифицированных специалистов. "Вторым важным применением ИИ для компаний – это борьба с дефицитом кадров ", – отметил глава холдинга.
+
+Руководитель также затронул вопрос импортозамещения: "К примеру, в российском финансовом секторе доступно 99% операций в цифровой среде по сравнению с 20% в странах Европы. Это позволяет реализовывать задачи на серверной инфраструктуре отечественного производства".
+
+Кроме того, компания заявила о запуске серийного выпуска системы автоматизации технологических процессов "СИЛАРОН". Прибор уже получил допуск Минпромторга для использования на непрерывных промышленных предприятиях. Фетисов считает перспективным направлением разработку так называемого тяжелого софта, ориентированного на промышленные нужды.
+</rewritten>
+
+<summary>
+Крупный российский IT-холдинг Т1 создает цифрового сотрудника с искусственным интеллектом для помощи новичкам в компании. Генеральный директор Алексей Фетисов подчеркнул важность ИИ не только как помощника в повседневных задачах, но и как средства оптимизации бизнес-процессов и решения кадрового дефицита.
+
+</summary>
+
+<tags>
+искусственный интеллект; экономика; сотрудники
+</tags>
