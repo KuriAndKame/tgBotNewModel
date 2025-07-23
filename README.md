@@ -24,6 +24,7 @@ API_HASH=ваш_api_hash
 PHONE_NUMBER=ваш_номер_телефона
 TELEGRAM_PASSWORD=ваш_пароль_для_2FA
 DB_URL=mysql+pymysql://имя_пользователя:пароль@хост/название_базы_данных
+CHECK_INTERVAL=время_обновления_новостей_в_секундах
 ```
 (Вам потребуются **API ID** и **API HASH** с [my.telegram.org](https://my.telegram.org/), а также **данные** для подключения к БД)
 
@@ -43,13 +44,25 @@ https://ria.ru/export/rss2/archive/index.xml
 
 5. Запуск
 
-**Telegram-парсер**
+**Telegram-парсер:**
 ```bash
 python TelegramParser.py
 ```
 При первом запуске потребуется ввести код подтверждения из Telegram и, при необходимости, пароль 2FA.
 
-**RSS-парсер**
+**RSS-парсер:**
 ```bash
 python RSSParser.py
 ```
+
+**Парсер новостей:**
+```bash
+python NewsParser.py
+```
+Источники данных — официальные новостные сайты Волгоградской области:
+- [https://volgograd.sledcom.ru/](https://volgograd.sledcom.ru/)
+- [https://34.мвд.рф/новости](https://34.xn--b1aew.xn--p1ai/новости)
+- [https://www.volgadmin.ru/d/list/news/admvlg](https://www.volgadmin.ru/d/list/news/admvlg)
+- [https://www.volgograd.ru/news/](https://www.volgograd.ru/news/)
+- [https://epp.genproc.gov.ru/web/proc_34](https://epp.genproc.gov.ru/web/proc_34)
+- [https://www.vesti.ru/search?q=волгоград&type=news&sort=date](https://www.vesti.ru/search?q=волгоград&type=news&sort=date)
