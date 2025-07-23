@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-from sqlalchemy import create_engine, Column, Integer, BigInteger, String, Text, DateTime
+from sqlalchemy import create_engine, Column, Integer, BigInteger, String, Text, DateTime, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 
 load_dotenv()
@@ -34,6 +34,22 @@ class RSSPost(Base):
     link = Column(String(512), nullable=False)
     rss_id = Column(String(255), nullable=False)
     source_type = Column(String(50), default='rss')
+    refactoredTitle = Column(String(255))
+    refactoredText = Column(Text)
+    resume = Column(Text)
+    tags = Column(String(255))
+
+
+class NewsPost(Base):
+    __tablename__ = 'news_posts'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    title = Column(String(500))
+    url = Column(String(500), unique=True)
+    content = Column(String(10000))
+    source = Column(String(100))
+    source_type = Column(String(50), default='site')
+    is_parsed = Column(Boolean, default=False)
     refactoredTitle = Column(String(255))
     refactoredText = Column(Text)
     resume = Column(Text)

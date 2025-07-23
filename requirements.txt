@@ -4,3 +4,6 @@ aiohttp
 feedparser
 sqlalchemy
 pymysql
+requests
+bs4
+urllib3

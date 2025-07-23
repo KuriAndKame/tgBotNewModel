@@ -16,11 +16,14 @@ def create_env_file():
     db_host = input("Хост MySQL (например, localhost): ").strip()
     db_name = input("Имя базы данных: ").strip()
 
+    check_interval = input("Интервал обновления новостей (в секундах): ").strip()
+
     env_content = f"""API_ID={api_id}
 API_HASH={api_hash}
 PHONE_NUMBER={phone_number}
 TELEGRAM_PASSWORD={password}
 DB_URL=mysql+pymysql://{db_user}:{db_password}@{db_host}/{db_name}
+CHECK_INTERVAL={check_interval}
 """
 
     env_path = Path('.') / '.env'

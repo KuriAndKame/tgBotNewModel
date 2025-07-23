@@ -1,6 +1,4 @@
-# Telegram & RSS Parser
-
-**Telegram & RSS Parser** — это Python-проект для мониторинга новостей из Telegram-каналов и RSS-лент. Парсеры сохраняют новые записи в формате JSON и позволяют автоматизировать сбор информации из разных источников.
+# Парсер новостей
 ## Установка
 
 1. Клонируйте репозиторий:
@@ -15,18 +13,20 @@ cd parser4vgtrk
 pip install -r requirements.txt
 ```
 
-3. Создайте файл **.env** с данными для авторизации в Telegram:
+3. Создайте файл **.env** с данными для авторизации:
 ```bash
 python DotEnvCreate.py
 ```
-Или создайте **.env** вручную:
+Или создайте **.env** в корневой директории проекта вручную:
 ```
 API_ID=ваш_api_id
 API_HASH=ваш_api_hash
 PHONE_NUMBER=ваш_номер_телефона
 TELEGRAM_PASSWORD=ваш_пароль_для_2FA
+DB_URL=mysql+pymysql://имя_пользователя:пароль@хост/название_базы_данных
+CHECK_INTERVAL=интервал_обновления_новостей_в_секундах
 ```
-(Вам потребуются **API ID** и **API HASH** с my.telegram.org)
+(Вам потребуются **API ID** и **API HASH** с [my.telegram.org](https://my.telegram.org/), а также **данные** для подключения к БД)
 
 4. Настройка источников
 
@@ -55,8 +55,13 @@ python TelegramParser.py
 python RSSParser.py
 ```
 
-6. Результаты
-
-**output/telegram.json** — список сообщений из Telegram.
-
-**output/rss.json** — список записей из RSS-лент.
+**Парсер новостей**
+```bash
+python NewsParser.py
+```
+Источники данных — официальные новостные сайты Волгоградской области:
+- [https://volgograd.sledcom.ru/](https://volgograd.sledcom.ru/)
+- [https://34.мвд.рф/новости](https://34.xn--b1aew.xn--p1ai/новости)
+- [https://www.volgadmin.ru/d/list/news/admvlg](https://www.volgadmin.ru/d/list/news/admvlg)
+- [https://www.volgograd.ru/news/](https://www.volgograd.ru/news/)
+- [https://epp.genproc.gov.ru/web/proc_34](https://epp.genproc.gov.ru/web/proc_34)

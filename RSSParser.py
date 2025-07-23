@@ -11,7 +11,7 @@ from models.Posts import RSSPost, init_db
 INPUT_SITES_FILE = 'data/sites.txt'
 OUTPUT_FILE = 'output/rss.json'
 DB_URL = os.getenv('DB_URL', 'mysql+pymysql://user:password@localhost/news_db')
-CHECK_INTERVAL = 60
+CHECK_INTERVAL = os.getenv('CHECK_INTERVAL', 60)
 
 
 class RSSParser:
@@ -159,13 +159,13 @@ class RSSParser:
             while True:
                 try:
                     await self.check_feeds()
-                    await asyncio.sleep(CHECK_INTERVAL)
+                    await asyncio.sleep(int(CHECK_INTERVAL))
                 except KeyboardInterrupt:
                     print("\nЗавершение работы RSS-парсера.")
                     break
                 except Exception as e:
                     print(f"Ошибка в основном цикле: {str(e)}.")
-                    await asyncio.sleep(30)
+                    await asyncio.sleep(int(CHECK_INTERVAL) / 2)
         self.engine.dispose()
 
 
