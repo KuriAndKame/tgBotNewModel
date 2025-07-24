@@ -49,7 +49,6 @@ class NewsPost(Base):
     content = Column(String(10000))
     source = Column(String(100))
     source_type = Column(String(50), default='site')
-    is_parsed = Column(Boolean, default=False)
     refactoredTitle = Column(String(255))
     refactoredText = Column(Text)
     resume = Column(Text)

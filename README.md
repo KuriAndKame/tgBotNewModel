@@ -66,3 +66,4 @@ python NewsParser.py
 - [https://www.volgograd.ru/news/](https://www.volgograd.ru/news/)
 - [https://epp.genproc.gov.ru/web/proc_34](https://epp.genproc.gov.ru/web/proc_34)
 - [https://www.vesti.ru/search?q=волгоград&type=news&sort=date](https://www.vesti.ru/search?q=волгоград&type=news&sort=date)
+- [https://tass.ru/tag/volgogradskaya-oblast](https://tass.ru/tag/volgogradskaya-oblast)
