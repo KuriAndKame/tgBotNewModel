@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
-from sqlalchemy import create_engine, Column, Integer, BigInteger, String, Text, DateTime, Boolean
+from sqlalchemy import create_engine, Column, Integer, BigInteger, String, Text, DateTime
+from sqlalchemy.dialects.mysql import TINYINT
 from sqlalchemy.ext.declarative import declarative_base
 
 load_dotenv()
@@ -53,6 +54,8 @@ class NewsPost(Base):
     refactoredText = Column(Text)
     resume = Column(Text)
     tags = Column(String(255))
+    tg_sent = Column(TINYINT, default=0)
+    dle_sent = Column(TINYINT, default=0)
 
 
 def init_db(db_url=None):
