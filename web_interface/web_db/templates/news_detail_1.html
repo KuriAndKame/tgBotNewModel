@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <!-- Левая карточка - исходный текст -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h3 class="card-header bg-light mb-3">Исходный текст</h3>
+                    <h2 class="card-title">{{ news.title }}</h2>
+                    <p class="card-text text-muted">
+                        Опубликовано: {{ news.date }}
+                    </p>
+                    <div class="card-text mt-4">
+                        {% for paragraph in news.content.split('\n') %}
+                            <p class="mb-3">{{ paragraph }}</p>  <!-- mb-3 добавляет отступ снизу -->
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Правая карточка - переформатированный текст -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h3 class="card-header bg-light mb-3">Переформатированный текст</h3>
+                    <h2 class="card-title">{{ news.refactoredTitle }}</h2>
+
+                    <!-- Строка с тегами -->
+                    {% if news.tags %}
+                    <div class="tags-section mb-3">
+                        <div class="d-flex flex-wrap gap-2">
+                            {% set tag_list = news.tags.split(';') %}
+                            {% for tag in tag_list %}
+                                {% if tag.strip() %}
+                                    <span class="badge bg-secondary">{{ tag.strip() }}</span>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="card-text mt-4">
+                        {% for paragraph in news.refactoredText.split('\n') %}
+                            <p class="mb-3">{{ paragraph }}</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Общая кнопка "Назад" внизу страницы -->
+    <div class="row mt-4">
+        <div class="col-12 text-center">
+            <a href="{{ url_for('index_posts') }}" class="btn btn-primary btn-lg">Назад к списку новостей</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

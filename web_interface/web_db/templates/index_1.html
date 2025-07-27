@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Новости</h1>
+        <a href="/" class="btn btn-primary">
+            Перейти к таблице news
+        </a>
+    </div>
+
+    <div id="news-container">
+        <!-- Новости будут загружены через JavaScript -->
+        <div class="text-center">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Загрузка...</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='script_1.js') }}"></script>
+{% endblock %}
