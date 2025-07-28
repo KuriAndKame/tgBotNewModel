@@ -1,0 +1,119 @@
+import edge_tts
+import asyncio
+import os
+import time
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from models import News, Articles  # Импортируем обе модели
+from datetime import datetime
+
+# Настройки
+voices = {
+    "female": "ru-RU-SvetlanaNeural",  # женский голос
+    "male": "ru-RU-DmitryNeural"       # мужской голос
+}
+output_folder = "audio_files"  # папка для сохранения MP3
+processed_items = set()  # множество для хранения ID обработанных записей (в формате "таблица:id")
+
+# Настройки базы данных
+DATABASE_URL = "sqlite:///your_database.db"  # замените на вашу строку подключения
+engine = create_engine(DATABASE_URL)
+Session = sessionmaker(bind=engine)
+
+# Создаем папку для аудио, если она не существует
+os.makedirs(output_folder, exist_ok=True)
+
+def load_already_processed_items():
+    """Загружаем список уже обработанных записей при старте"""
+    if os.path.exists('processed_items.txt'):
+        with open('processed_items.txt', 'r') as f:
+            for line in f:
+                processed_items.add(line.strip())
+
+def save_processed_items():
+    """Сохраняем список обработанных записей"""
+    with open('processed_items.txt', 'w') as f:
+        for item_id in processed_items:
+            f.write(item_id + '\n')
+
+async def generate_speech(text, output_file, voice):
+    try:
+        tts = edge_tts.Communicate(text=text, voice=voice)
+        await tts.save(output_file)
+    except Exception as e:
+        print(f"Ошибка при генерации речи ({voice}): {e}")
+
+def process_item(item, table_name):
+    try:
+        item_id = f"{table_name}:{item.id}"
+        if item_id in processed_items:
+            return
+            
+        text = item.refactoredText
+        title = item.refactoredTitle
+        
+        if not text or not text.strip():
+            print(f"Запись {item_id} пуста, пропускаем.")
+            return
+            
+        # Создаем имя файла из refactoredTitle (с заменой недопустимых символов)
+        safe_title = "".join(c if c.isalnum() or c in " _-" else "_" for c in title)
+        
+        # Генерируем обе версии озвучки
+        for gender, voice in voices.items():
+            output_file = os.path.join(
+                output_folder, 
+                f"{safe_title}_{table_name}_{gender}.mp3"
+            )
+            
+            # Генерируем речь
+            asyncio.run(generate_speech(text, output_file, voice))
+            print(f"Обработана запись {item_id} ({gender}) -> {output_file}")
+        
+        # Добавляем запись в обработанные
+        processed_items.add(item_id)
+        
+    except Exception as e:
+        print(f"Ошибка при обработке записи {item_id}: {e}")
+
+def monitor_database():
+    """Мониторим базу данных на наличие новых записей в обеих таблицах"""
+    print("Мониторинг базы данных начат...")
+    load_already_processed_items()
+    
+    try:
+        while True:
+            session = Session()
+            try:
+                # Обрабатываем таблицу News
+                news_items = session.query(News).filter(
+                    News.refactoredText.isnot(None),
+                    News.refactoredTitle.isnot(None)
+                ).all()
+                
+                for item in news_items:
+                    process_item(item, "news")
+                
+                # Обрабатываем таблицу Articles
+                articles_items = session.query(Articles).filter(
+                    Articles.refactoredText.isnot(None),
+                    Articles.refactoredTitle.isnot(None)
+                ).all()
+                
+                for item in articles_items:
+                    process_item(item, "articles")
+                
+                session.commit()
+            except Exception as e:
+                session.rollback()
+                print(f"Ошибка при работе с базой данных: {e}")
+            finally:
+                session.close()
+            
+            time.sleep(60)  # Проверяем каждую минуту
+    except KeyboardInterrupt:
+        save_processed_items()
+        print("Мониторинг остановлен.")
+
+if __name__ == "__main__":
+    monitor_database()
