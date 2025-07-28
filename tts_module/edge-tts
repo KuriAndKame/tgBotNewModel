@@ -5,8 +5,12 @@ import time
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
-# Настройки
-voice = "ru-RU-SvetlanaNeural"  # русский голос
+# Настройки голосов
+voices = [
+    {"name": "ru-RU-SvetlanaNeural", "gender": "женский"},
+    {"name": "ru-RU-DmitryNeural", "gender": "мужской"}
+]
+
 input_folder = "text_files"  # папка для мониторинга TXT файлов
 output_folder = "audio_files"  # папка для сохранения MP3
 processed_files = set()  # множество для хранения обработанных файлов
@@ -33,27 +37,30 @@ def process_file(file_path):
             print(f"Файл {file_path} пуст, пропускаем.")
             return
             
-        output_file = os.path.join(
-            output_folder, 
-            os.path.splitext(os.path.basename(file_path))[0] + ".mp3"
-        )
+        base_name = os.path.splitext(os.path.basename(file_path))[0]
         
-        # Генерируем речь
-        asyncio.run(generate_speech(text, output_file))
+        # Генерируем речь для каждого голоса
+        for voice in voices:
+            output_file = os.path.join(
+                output_folder, 
+                f"{base_name}_{voice['gender']}.mp3"
+            )
+            asyncio.run(generate_speech(text, output_file, voice['name']))
+            print(f"Создана {voice['gender']} версия: {output_file}")
         
         # Добавляем файл в обработанные
         processed_files.add(file_path)
-        print(f"Обработан файл {file_path} -> {output_file}")
+        print(f"Обработан файл {file_path} с созданием 2 версий озвучки")
         
     except Exception as e:
         print(f"Ошибка при обработке файла {file_path}: {e}")
 
-async def generate_speech(text, output_file):
+async def generate_speech(text, output_file, voice):
     try:
         tts = edge_tts.Communicate(text=text, voice=voice)
         await tts.save(output_file)
     except Exception as e:
-        print(f"Ошибка при генерации речи: {e}")
+        print(f"Ошибка при генерации речи голосом {voice}: {e}")
 
 def load_already_processed_files():
     """Загружаем список уже обработанных файлов при старте"""
@@ -75,6 +82,10 @@ def monitor_folder():
     observer.start()
     
     print(f"Мониторинг папки {input_folder} начат...")
+    print(f"Будут создаваться 2 версии озвучки для каждого файла:")
+    for voice in voices:
+        print(f"- {voice['gender']} голос ({voice['name']})")
+    
     try:
         while True:
             # Проверяем существующие файлы при старте
