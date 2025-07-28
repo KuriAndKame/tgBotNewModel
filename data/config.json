@@ -1,7 +1,7 @@
 {
-  "api_id": ,
-  "api_hash": "",
-  "phone": "",
+  "api_id": 27636080,
+  "api_hash": "273e2fb4d3773f6ef4b00c965bdaadf6",
+  "phone": "+2250544889349",
   "media_dir": "data/media",
-  "db_url": ""
+  "db_url": "mysql+pymysql://root:1234@127.0.0.1:3306/telegram_news"
 }

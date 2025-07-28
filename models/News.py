@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime, UniqueConstraint
+from sqlalchemy import Column, Integer, String, Text, DateTime, UniqueConstraint, Boolean
 from db.database import Base
 
 class News(Base):
@@ -16,6 +16,7 @@ class News(Base):
     refactoredText = Column(Text)
     resume = Column(Text)
     tags = Column(String(255))
+    is_telegram = Column(Boolean)
 
     __table_args__ = (
         UniqueConstraint('telegram_msg_id', 'source', name='uix_msg_source'),

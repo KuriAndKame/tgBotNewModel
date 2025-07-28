@@ -1,3 +1,4 @@
+import json
 import os
 from collections import defaultdict
 from datetime import datetime
@@ -5,7 +6,6 @@ from telethon.tl.functions.messages import GetHistoryRequest
 from db.database import SessionLocal
 from models.News import News
 from scraper.utils import extract_title_and_summary
-import json
 
 with open("data/config.json", "r", encoding="utf-8") as f:
     config = json.load(f)
@@ -38,7 +38,8 @@ async def fetch_new_messages(client, channel_name):
             grouped[dt_key].append(msg)
 
         for dt, msgs in grouped.items():
-            exists = session.query(News).filter_by(date=dt, source=channel_name).first()
+            #exists = session.query(News).filter_by(date=dt, source=channel_name).first()
+            exists = session.query(News).filter_by(telegram_msg_id=msgs[0].id, source=channel_name).first()
             if exists:
                 continue
 
@@ -77,7 +78,8 @@ async def fetch_new_messages(client, channel_name):
                 title=title,
                 summary=summary,
                 text=text,
-                media_file=";".join(media_files) if media_files else None
+                media_file=";".join(media_files) if media_files else None,
+                is_telegram = True
             )
 
             session.add(news)
