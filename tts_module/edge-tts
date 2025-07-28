@@ -1,0 +1,95 @@
+import edge_tts
+import asyncio
+import os
+import time
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
+
+# Настройки
+voice = "ru-RU-SvetlanaNeural"  # русский голос
+input_folder = "text_files"  # папка для мониторинга TXT файлов
+output_folder = "audio_files"  # папка для сохранения MP3
+processed_files = set()  # множество для хранения обработанных файлов
+
+# Создаем папки, если они не существуют
+os.makedirs(input_folder, exist_ok=True)
+os.makedirs(output_folder, exist_ok=True)
+
+class TextFileHandler(FileSystemEventHandler):
+    def on_created(self, event):
+        if event.is_directory:
+            return
+        if event.src_path.endswith('.txt'):
+            file_path = event.src_path
+            if file_path not in processed_files:
+                process_file(file_path)
+
+def process_file(file_path):
+    try:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            text = file.read()
+        
+        if not text.strip():
+            print(f"Файл {file_path} пуст, пропускаем.")
+            return
+            
+        output_file = os.path.join(
+            output_folder, 
+            os.path.splitext(os.path.basename(file_path))[0] + ".mp3"
+        )
+        
+        # Генерируем речь
+        asyncio.run(generate_speech(text, output_file))
+        
+        # Добавляем файл в обработанные
+        processed_files.add(file_path)
+        print(f"Обработан файл {file_path} -> {output_file}")
+        
+    except Exception as e:
+        print(f"Ошибка при обработке файла {file_path}: {e}")
+
+async def generate_speech(text, output_file):
+    try:
+        tts = edge_tts.Communicate(text=text, voice=voice)
+        await tts.save(output_file)
+    except Exception as e:
+        print(f"Ошибка при генерации речи: {e}")
+
+def load_already_processed_files():
+    """Загружаем список уже обработанных файлов при старте"""
+    if os.path.exists('processed_files.txt'):
+        with open('processed_files.txt', 'r') as f:
+            for line in f:
+                processed_files.add(line.strip())
+
+def save_processed_files():
+    """Сохраняем список обработанных файлов"""
+    with open('processed_files.txt', 'w') as f:
+        for file_path in processed_files:
+            f.write(file_path + '\n')
+
+def monitor_folder():
+    event_handler = TextFileHandler()
+    observer = Observer()
+    observer.schedule(event_handler, input_folder, recursive=False)
+    observer.start()
+    
+    print(f"Мониторинг папки {input_folder} начат...")
+    try:
+        while True:
+            # Проверяем существующие файлы при старте
+            for filename in os.listdir(input_folder):
+                if filename.endswith('.txt'):
+                    file_path = os.path.join(input_folder, filename)
+                    if file_path not in processed_files:
+                        process_file(file_path)
+            
+            time.sleep(10)  # Проверяем каждые 10 секунд
+    except KeyboardInterrupt:
+        observer.stop()
+        save_processed_files()
+    observer.join()
+
+if __name__ == "__main__":
+    load_already_processed_files()
+    monitor_folder()
