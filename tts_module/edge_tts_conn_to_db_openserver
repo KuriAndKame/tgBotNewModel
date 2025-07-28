@@ -1,0 +1,151 @@
+import edge_tts
+import asyncio
+import os
+import time
+import shutil
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from models import News, Articles  # Импортируем обе модели
+from datetime import datetime
+
+# Настройки
+voice = "ru-RU-SvetlanaNeural"  # русский голос
+output_folder = "audio_files"  # локальная папка для временного хранения MP3
+web_folder = "C:/OpenServer/domains/yoursite.local/audio/"  # папка сайта в Open Server
+web_url = "http://yoursite.local/audio/"  # URL для доступа к аудиофайлам
+
+processed_items = set()  # множество для хранения ID обработанных записей
+
+# Настройки базы данных
+DATABASE_URL = "sqlite:///your_database.db"
+engine = create_engine(DATABASE_URL)
+Session = sessionmaker(bind=engine)
+
+# Создаем папки, если они не существуют
+os.makedirs(output_folder, exist_ok=True)
+os.makedirs(web_folder, exist_ok=True)
+
+def load_already_processed_items():
+    """Загружаем список уже обработанных записей"""
+    if os.path.exists('processed_items.txt'):
+        with open('processed_items.txt', 'r') as f:
+            for line in f:
+                processed_items.add(line.strip())
+
+def save_processed_items():
+    """Сохраняем список обработанных записей"""
+    with open('processed_items.txt', 'w') as f:
+        for item_id in processed_items:
+            f.write(item_id + '\n')
+
+async def generate_speech(text, output_file):
+    """Генерация аудио из текста"""
+    try:
+        tts = edge_tts.Communicate(text=text, voice=voice)
+        await tts.save(output_file)
+    except Exception as e:
+        print(f"Ошибка при генерации речи: {e}")
+
+def upload_to_website(local_path, web_path):
+    """Копирование файла в папку сайта Open Server"""
+    try:
+        shutil.copy2(local_path, web_path)
+        print(f"Файл загружен на сайт: {web_path}")
+        return True
+    except Exception as e:
+        print(f"Ошибка при загрузке на сайт: {e}")
+        return False
+
+def process_item(item, table_name):
+    """Обработка одной записи из БД"""
+    try:
+        item_id = f"{table_name}:{item.id}"
+        if item_id in processed_items:
+            return None  # Пропускаем уже обработанные
+            
+        text = item.refactoredText
+        title = item.refactoredTitle
+        
+        if not text or not text.strip():
+            print(f"Запись {item_id} пуста, пропускаем.")
+            return None
+            
+        # Создаем имя файла
+        safe_title = "".join(c if c.isalnum() or c in " _-" else "_" for c in title)
+        local_file = os.path.join(output_folder, f"{safe_title}_{table_name}.mp3")
+        web_file = os.path.join(web_folder, f"{safe_title}_{table_name}.mp3")
+        public_url = f"{web_url}{safe_title}_{table_name}.mp3"
+        
+        # Генерируем речь
+        asyncio.run(generate_speech(text, local_file))
+        
+        # Загружаем на сайт
+        if upload_to_website(local_file, web_file):
+            # Добавляем запись в обработанные
+            processed_items.add(item_id)
+            print(f"Обработана запись {item_id} -> {public_url}")
+            return public_url
+        return None
+        
+    except Exception as e:
+        print(f"Ошибка при обработке записи {item_id}: {e}")
+        return None
+
+def update_database_with_url(session, item, url):
+    """Обновляем запись в БД с URL аудио"""
+    try:
+        if hasattr(item, 'audio_url'):  # Проверяем наличие поля
+            item.audio_url = url
+            session.commit()
+            print(f"Обновлена запись {item.id} с URL аудио")
+    except Exception as e:
+        session.rollback()
+        print(f"Ошибка при обновлении БД: {e}")
+
+def monitor_database():
+    """Мониторинг базы данных и обработка записей"""
+    print("Мониторинг базы данных начат...")
+    load_already_processed_items()
+    
+    try:
+        while True:
+            session = Session()
+            try:
+                # Обрабатываем таблицу News
+                news_items = session.query(News).filter(
+                    News.refactoredText.isnot(None),
+                    News.refactoredTitle.isnot(None),
+                    News.audio_url.is_(None)  # Только записи без аудио
+                ).all()
+                
+                for item in news_items:
+                    audio_url = process_item(item, "news")
+                    if audio_url:
+                        update_database_with_url(session, item, audio_url)
+                
+                # Обрабатываем таблицу Articles
+                articles_items = session.query(Articles).filter(
+                    Articles.refactoredText.isnot(None),
+                    Articles.refactoredTitle.isnot(None),
+                    Articles.audio_url.is_(None)  # Только записи без аудио
+                ).all()
+                
+                for item in articles_items:
+                    audio_url = process_item(item, "articles")
+                    if audio_url:
+                        update_database_with_url(session, item, audio_url)
+                
+                session.commit()
+            except Exception as e:
+                session.rollback()
+                print(f"Ошибка при работе с базой данных: {e}")
+            finally:
+                session.close()
+            
+            time.sleep(60)  # Проверяем каждую минуту
+    except KeyboardInterrupt:
+        save_processed_items()
+        print("Мониторинг остановлен.")
+
+if __name__ == "__main__":
+    monitor_database()
