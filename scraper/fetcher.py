@@ -37,7 +37,10 @@ async def fetch_new_messages(client, channel_name):
             dt_key = msg.date.replace(microsecond=0)
             grouped[dt_key].append(msg)
 
+        today = datetime.utcnow().date()
         for dt, msgs in grouped.items():
+            if dt.date() != today:
+                continue
             #exists = session.query(News).filter_by(date=dt, source=channel_name).first()
             exists = session.query(News).filter_by(telegram_msg_id=msgs[0].id, source=channel_name).first()
             if exists:

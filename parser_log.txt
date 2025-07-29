@@ -1,2 +1,35 @@
 [29.07.2025  2:40:00,94] ==== PARSER ON AIR ==== 
-^C
+^C[29.07.2025  3:53:29,44] ==== PARSER ON AIR ==== 
+^C[29.07.2025  3:54:47,61] ==== PARSER ON AIR ==== 
+Парсер запущен. Проверка каждые 30.0 секунд...
+[Очистка] Следующая очистка в 2025-07-30 03:00:00 МСК (через 83110 сек)
+Traceback (most recent call last):
+  File "C:\Users\Drugalek\AppData\Local\Programs\Python\Python313\Lib\asyncio\runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "C:\Users\Drugalek\AppData\Local\Programs\Python\Python313\Lib\asyncio\base_events.py", line 725, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "D:\Edu\tgBotNewModel\tg_scraper.py", line 67, in main
+    await asyncio.sleep(TICK)
+  File "C:\Users\Drugalek\AppData\Local\Programs\Python\Python313\Lib\asyncio\tasks.py", line 718, in sleep
+    return await future
+           ^^^^^^^^^^^^
+asyncio.exceptions.CancelledError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Edu\tgBotNewModel\tg_scraper.py", line 70, in <module>
+    asyncio.run(main())
+    ~~~~~~~~~~~^^^^^^^^
+  File "C:\Users\Drugalek\AppData\Local\Programs\Python\Python313\Lib\asyncio\runners.py", line 195, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "C:\Users\Drugalek\AppData\Local\Programs\Python\Python313\Lib\asyncio\runners.py", line 123, in run
+    raise KeyboardInterrupt()
+KeyboardInterrupt
+^C[29.07.2025  3:55:23,06] ==== PARSER ON AIR ==== 
+^C[29.07.2025  3:57:01,13] ==== PARSER ON AIR ==== 
+^C[29.07.2025  4:03:39,13] ==== PARSER ON AIR ==== 
+^C[29.07.2025  4:04:49,91] ==== PARSER ON AIR ==== 
