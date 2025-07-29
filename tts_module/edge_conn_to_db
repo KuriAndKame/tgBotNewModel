@@ -8,10 +8,7 @@ from models import News, Articles
 from datetime import datetime
 
 # Настройки
-voices = {
-    "female": "ru-RU-SvetlanaNeural",
-    "male": "ru-RU-DmitryNeural"
-}
+voice = "ru-RU-SvetlanaNeural"
 output_folder = "audio_files"
 processed_items = set()
 processed_items_path = "processed/processed_items.txt"  # Новый путь к файлу
