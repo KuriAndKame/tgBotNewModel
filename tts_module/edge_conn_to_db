@@ -4,32 +4,37 @@ import os
 import time
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from models import News, Articles  # Импортируем обе модели
+from models import News, Articles
 from datetime import datetime
 
 # Настройки
-voice = "ru-RU-SvetlanaNeural"  # русский голос
-output_folder = "audio_files"  # папка для сохранения MP3
-processed_items = set()  # множество для хранения ID обработанных записей (в формате "таблица:id")
+voices = {
+    "female": "ru-RU-SvetlanaNeural",
+    "male": "ru-RU-DmitryNeural"
+}
+output_folder = "audio_files"
+processed_items = set()
+processed_items_path = "processed/processed_items.txt"  # Новый путь к файлу
 
 # Настройки базы данных
-DATABASE_URL = "sqlite:///your_database.db"  # замените на вашу строку подключения
+DATABASE_URL = "sqlite:///your_database.db"
 engine = create_engine(DATABASE_URL)
 Session = sessionmaker(bind=engine)
 
-# Создаем папку для аудио, если она не существует
+# Создаем необходимые папки
 os.makedirs(output_folder, exist_ok=True)
+os.makedirs(os.path.dirname(processed_items_path), exist_ok=True)  # Создаем папку для processed_items.txt
 
 def load_already_processed_items():
-    """Загружаем список уже обработанных записей при старте"""
-    if os.path.exists('processed_items.txt'):
-        with open('processed_items.txt', 'r') as f:
+    """Загружаем список уже обработанных записей из указанного пути"""
+    if os.path.exists(processed_items_path):
+        with open(processed_items_path, 'r', encoding='utf-8') as f:
             for line in f:
                 processed_items.add(line.strip())
 
 def save_processed_items():
-    """Сохраняем список обработанных записей"""
-    with open('processed_items.txt', 'w') as f:
+    """Сохраняем список обработанных записей по указанному пути"""
+    with open(processed_items_path, 'w', encoding='utf-8') as f:
         for item_id in processed_items:
             f.write(item_id + '\n')
 
