@@ -1,0 +1,8 @@
+option batch on
+option confirm off
+
+open ftpes://MyFTP:MyFTP@79.170.162.18/
+lcd C:\MyGeneratedFiles
+cd /
+put *.*
+exit
